@@ -28,7 +28,7 @@ dependencies:
 - base >=4.8
 - ef-base ==3.0.*
 - ef-core ==3.0.*
-- atomic ==4.0.*
+- atomic ==0.5.*
 - lens
 - tagsoup
 - void
@@ -38,4 +38,3 @@ library:
     - condition: impl(ghcjs -any)
       dependencies:
         - ghcjs-base
-
