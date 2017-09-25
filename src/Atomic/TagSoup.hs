@@ -1,14 +1,16 @@
 {-# language CPP #-}
 module Atomic.TagSoup where
 
-import Atomic
-import Component
+import View
 
 import Text.HTML.TagSoup.Tree as TS
 import Text.HTML.TagSoup as TS
 import Text.StringLike
 
-import qualified Data.Txt as T
+import Data.Maybe
+
+import qualified Data.Map as M
+import qualified Txt as T
 
 #ifdef __GHCJS__
 instance StringLike Txt where
@@ -36,14 +38,14 @@ parseView = fmap convertTree . parseTree
       case tree of
         TagBranch t as cs ->
           if t == "svg" then
-            SVGHTML Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
+            SVGView Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
           else
-            HTML Nothing t (fmap convertAttribute as) (fmap convertTree cs)
+            HTMLView Nothing t (fmap convertAttribute as) (fmap convertTree cs)
         TagLeaf t ->
           case t of
-            TagText tt   -> TextHTML Nothing tt
-            TagOpen t as -> HTML Nothing t (fmap convertAttribute as) []
-            _            -> NullHTML Nothing
+            TagText tt   -> TextView Nothing tt
+            TagOpen t as -> HTMLView Nothing t (fmap convertAttribute as) []
+            _            -> NullView Nothing
 
 
     convertSVGTree :: TagTree Txt -> View '[]
@@ -51,14 +53,14 @@ parseView = fmap convertTree . parseTree
       case tree of
         TagBranch t as cs ->
           if t == "foreignObject" then
-            SVGHTML Nothing t (fmap convertAttribute as) (fmap convertTree cs)
+            SVGView Nothing t (fmap convertAttribute as) (fmap convertTree cs)
           else
-            SVGHTML Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
+            SVGView Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
         TagLeaf t ->
           case t of
-            TagText tt   -> TextHTML Nothing tt
-            TagOpen t as -> SVGHTML Nothing t (fmap convertAttribute as) []
-            _            -> NullHTML Nothing
+            TagText tt   -> TextView Nothing tt
+            TagOpen t as -> SVGView Nothing t (fmap convertAttribute as) []
+            _            -> NullView Nothing
 
     convertAttribute :: TS.Attribute Txt -> Feature '[]
     convertAttribute (k,v) = let v' = T.toLower v in
@@ -73,19 +75,19 @@ parseView = fmap convertTree . parseTree
                    Just (pre,T.tail suf)
             kvs = mapMaybe brk ss
         in
-          StyleList kvs
+          StyleList (M.fromList kvs)
       else if k == "href" then
         if dumbRelativeCheck v then
-          LinkTo v Nothing
+          Lref v
         else
-          Attribute "href" v
+          Href v
       else if T.isPrefixOf "xlink:" k then
           if k == "xlink:href" then
-            SVGLinkTo v Nothing
+            SVGLink v
           else
-            XLink k v
+            xlink k v
       else
-        Attribute k v
+        Attr k v
 
 dumbRelativeCheck :: Txt -> Bool
 dumbRelativeCheck t = T.isPrefixOf "/" t && not (T.isPrefixOf "//" t)

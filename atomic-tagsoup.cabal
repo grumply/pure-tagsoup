@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:           atomic-tagsoup
-version:        0.1.0.0
+version:        0.6.0.0
 author:         S. M. Hickman
 maintainer:     sean@grump.ly
 license:        BSD3
@@ -16,15 +16,11 @@ library
   default-extensions: ScopedTypeVariables RecordWildCards FlexibleContexts NoMonomorphismRestriction MultiParamTypeClasses TypeOperators DataKinds OverloadedStrings BangPatterns RankNTypes TypeFamilies DeriveGeneric DeriveAnyClass FlexibleInstances TemplateHaskell DeriveDataTypeable StandaloneDeriving ViewPatterns ImplicitParams RoleAnnotations
   build-depends:
       base >=4.8
-    , ef-base ==3.0.*
-    , ef-core ==3.0.*
-    , atomic ==4.0.*
-    , lens
+    , ef
+    , ef-base
+    , atomic
     , tagsoup
-    , void
-  if impl(ghcjs -any)
-    build-depends:
-        ghcjs-base
+    , containers
   exposed-modules:
       Atomic.TagSoup
   default-language: Haskell2010
