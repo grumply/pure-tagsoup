@@ -2,8 +2,9 @@
 --
 -- see: https://github.com/sol/hpack
 
-name:           atomic-tagsoup
+name:           pure-tagsoup
 version:        0.6.0.0
+synopsis:       Tagsoup compatability for pure.
 author:         S. M. Hickman
 maintainer:     sean@grump.ly
 license:        BSD3
@@ -18,9 +19,9 @@ library
       base >=4.8
     , ef
     , ef-base
-    , atomic
+    , pure
     , tagsoup
     , containers
   exposed-modules:
-      Atomic.TagSoup
+      Pure.TagSoup
   default-language: Haskell2010

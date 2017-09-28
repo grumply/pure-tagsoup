@@ -2,10 +2,6 @@
 	path = deps/tlc
 	url = https://github.com/grumply/tlc.git
 	branch = master
-[submodule "deps/atomic-app"]
-	path = deps/atomic-app
-	url = https://github.com/grumply/atomic-app.git
-	branch = master
 [submodule "deps/ef"]
 	path = deps/ef
 	url = https://github.com/grumply/ef.git
@@ -17,8 +13,4 @@
 [submodule "deps/trivial"]
 	path = deps/trivial
 	url = https://github.com/grumply/trivial.git
-	branch = master
-[submodule "deps/atomic"]
-	path = deps/atomic
-	url = https://github.com/grumply/atomic.git
 	branch = master

@@ -20,11 +20,11 @@ let
               trivial =
                 new.callPackage ./deps/trivial/trivial.nix { };
 
-              atomic =
-                new.callPackage ./deps/atomic/atomic.nix { };
+              pure =
+                new.callPackage ./deps/pure/pure.nix { };
 
-              atomic-tagsoup =
-                new.callPackage ./atomic-tagsoup.nix { };
+              pure-tagsoup =
+                new.callPackage ./pure-tagsoup.nix { };
 
             };
           };
@@ -41,6 +41,6 @@ in
     atomic = pkgs.haskell.packages.${compiler}.atomic;
     tlc = pkgs.haskell.packages.${compiler}.tlc;
     trivial = pkgs.haskell.packages.${compiler}.trivial;
-    atomic-tagsoup = pkgs.haskell.packages.${compiler}.atomic-tagsoup;
+    pure-tagsoup = pkgs.haskell.packages.${compiler}.pure-tagsoup;
   }
 

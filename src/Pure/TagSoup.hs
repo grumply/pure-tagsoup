@@ -1,7 +1,8 @@
 {-# language CPP #-}
-module Atomic.TagSoup where
+module Pure.TagSoup where
 
-import View
+import Pure.Txt as T
+import Pure.View
 
 import Text.HTML.TagSoup.Tree as TS
 import Text.HTML.TagSoup as TS
@@ -10,7 +11,6 @@ import Text.StringLike
 import Data.Maybe
 
 import qualified Data.Map as M
-import qualified Txt as T
 
 #ifdef __GHCJS__
 instance StringLike Txt where
