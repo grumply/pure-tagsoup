@@ -14,3 +14,7 @@
 	path = deps/trivial
 	url = https://github.com/grumply/trivial.git
 	branch = master
+[submodule "deps/pure"]
+	path = deps/pure
+	url = https://github.com/grumply/pure.git
+	branch = master
