@@ -1,9 +1,5 @@
--- This file has been generated from package.yaml by hpack version 0.14.0.
---
--- see: https://github.com/sol/hpack
-
 name:           pure-tagsoup
-version:        0.6.0.0
+version:        0.6.0.1
 synopsis:       Tagsoup compatability for pure.
 author:         S. M. Hickman
 maintainer:     sean@grump.ly

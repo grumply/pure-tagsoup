@@ -75,7 +75,7 @@ parseView = fmap convertTree . parseTree
                    Just (pre,T.tail suf)
             kvs = mapMaybe brk ss
         in
-          StyleList (M.fromList kvs)
+          StyleList kvs
       else if k == "href" then
         if dumbRelativeCheck v then
           Lref v
