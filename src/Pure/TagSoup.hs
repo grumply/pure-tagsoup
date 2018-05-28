@@ -1,93 +1,97 @@
-{-# language CPP #-}
+{-# language CPP, OverloadedStrings, FlexibleInstances #-}
 module Pure.TagSoup where
 
-import Pure.Txt as T
-import Pure.View
+-- from base
+import Data.Maybe
+import Data.List as List
 
+-- from pure-core
+import Pure.Data.View
+import Pure.Data.View.Patterns
+
+-- from pure-txt
+import Pure.Data.Txt.Internal as Txt
+
+-- from tagsoup
 import Text.HTML.TagSoup.Tree as TS
 import Text.HTML.TagSoup as TS
 import Text.StringLike
 
-import Data.Maybe
-
-import qualified Data.Map as M
-
 #ifdef __GHCJS__
 instance StringLike Txt where
-  empty = T.empty
-  cons = T.cons
+  empty = Txt.empty
+  cons = Txt.cons
   uncons t =
     -- careful here because of a ghcjs bug
-    if T.null t then
+    if Txt.null t then
       Nothing
     else
-      let ~(Just ~(c,rest)) = T.uncons t
+      let ~(Just ~(c,rest)) = Txt.uncons t
       in (Just (c,rest))
-  toString = T.unpack
-  fromChar = T.singleton
-  strConcat = T.concat
-  strNull = T.null
-  append = T.append
+  toString = Txt.unpack
+  fromChar = Txt.singleton
+  strConcat = Txt.concat
+  strNull = Txt.null
+  append = Txt.append
 #endif
 
-parseView :: Txt -> [View '[]]
+parseView :: Txt -> [View]
 parseView = fmap convertTree . parseTree
   where
-    convertTree :: TagTree Txt -> View '[]
+    convertTree :: TagTree Txt -> View
     convertTree tree =
       case tree of
         TagBranch t as cs ->
           if t == "svg" then
-            SVGView Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
+            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
           else
-            HTMLView Nothing t (fmap convertAttribute as) (fmap convertTree cs)
+            HTMLView Nothing t (List.foldr addFeature mempty as) (fmap convertTree cs)
         TagLeaf t ->
           case t of
             TagText tt   -> TextView Nothing tt
-            TagOpen t as -> HTMLView Nothing t (fmap convertAttribute as) []
+            TagOpen t as -> HTMLView Nothing t (List.foldr addFeature mempty as) []
             _            -> NullView Nothing
 
 
-    convertSVGTree :: TagTree Txt -> View '[]
+    convertSVGTree :: TagTree Txt -> View
     convertSVGTree tree =
       case tree of
         TagBranch t as cs ->
           if t == "foreignObject" then
-            SVGView Nothing t (fmap convertAttribute as) (fmap convertTree cs)
+            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertTree cs)
           else
-            SVGView Nothing t (fmap convertAttribute as) (fmap convertSVGTree cs)
+            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
         TagLeaf t ->
           case t of
             TagText tt   -> TextView Nothing tt
-            TagOpen t as -> SVGView Nothing t (fmap convertAttribute as) []
+            TagOpen t as -> AddXLinks (List.foldr xlinks [] as) $
+              SVGView Nothing t (List.foldr addFeature mempty as) mempty []
             _            -> NullView Nothing
 
-    convertAttribute :: TS.Attribute Txt -> Feature '[]
-    convertAttribute (k,v) = let v' = T.toLower v in
-      if v == "style" then
-        let ss = T.splitOn ";" v
+    addFeature :: TS.Attribute Txt -> Features -> Features
+    addFeature (k,v) = let k' = Txt.toLower k in
+      if k' == "style" then
+        let ss = Txt.splitOn ";" v
             brk t =
-              let (pre,suf) = T.break (== ':') t
+              let (pre,suf) = Txt.break (== ':') t
                  -- ghcjs bug requires this
-              in if T.null suf then
+              in if Txt.null suf then
                    Nothing
                  else
-                   Just (pre,T.tail suf)
+                   Just (pre,Txt.tail suf)
             kvs = mapMaybe brk ss
         in
-          StyleList kvs
-      else if k == "href" then
-        if dumbRelativeCheck v then
-          Lref v
-        else
-          Href v
-      else if T.isPrefixOf "xlink:" k then
-          if k == "xlink:href" then
-            SVGLink v
-          else
-            xlink k v
+          AddStyles kvs
+      else if Txt.isPrefixOf "xlink:" k' then
+          id
       else
-        Attr k v
+        Property k' v
 
-dumbRelativeCheck :: Txt -> Bool
-dumbRelativeCheck t = T.isPrefixOf "/" t && not (T.isPrefixOf "//" t)
+    xlinks (k,v) = let k' = Txt.toLower k in
+      if Txt.isPrefixOf "xlink:" k' then
+        ((k',v):)
+      else
+        id
+
+-- dumbRelativeCheck :: Txt -> Bool
+-- dumbRelativeCheck t = T.isPrefixOf "/" t && not (T.isPrefixOf "//" t)

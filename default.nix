@@ -1,13 +1,9 @@
-{ mkDerivation, base, containers, ef, ef-base, pure, stdenv
-, tagsoup
-}:
+{ mkDerivation, base, pure-core, pure-txt, stdenv, tagsoup }:
 mkDerivation {
   pname = "pure-tagsoup";
-  version = "0.6.0.1";
+  version = "0.7.0.0";
   src = ./.;
-  libraryHaskellDepends = [
-    base containers ef ef-base pure tagsoup
-  ];
-  description = "Tagsoup compatability for pure";
+  libraryHaskellDepends = [ base pure-core pure-txt tagsoup ];
+  homepage = "github.com/grumply/pure-tagsoup";
   license = stdenv.lib.licenses.bsd3;
 }
