@@ -43,7 +43,7 @@ parseView = fmap convertTree . parseTree
       case tree of
         TagBranch t as cs ->
           if t == "svg" then
-            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
+            XLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
           else
             HTMLView Nothing t (List.foldr addFeature mempty as) (fmap convertTree cs)
         TagLeaf t ->
@@ -58,13 +58,13 @@ parseView = fmap convertTree . parseTree
       case tree of
         TagBranch t as cs ->
           if t == "foreignObject" then
-            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertTree cs)
+            XLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertTree cs)
           else
-            AddXLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
+            XLinks (List.foldr xlinks [] as) $ SVGView Nothing t (List.foldr addFeature mempty as) mempty (fmap convertSVGTree cs)
         TagLeaf t ->
           case t of
             TagText tt   -> TextView Nothing tt
-            TagOpen t as -> AddXLinks (List.foldr xlinks [] as) $
+            TagOpen t as -> XLinks (List.foldr xlinks [] as) $
               SVGView Nothing t (List.foldr addFeature mempty as) mempty []
             _            -> NullView Nothing
 
@@ -81,7 +81,7 @@ parseView = fmap convertTree . parseTree
                    Just (pre,Txt.tail suf)
             kvs = mapMaybe brk ss
         in
-          AddStyles kvs
+          Styles kvs
       else if Txt.isPrefixOf "xlink:" k' then
           id
       else
