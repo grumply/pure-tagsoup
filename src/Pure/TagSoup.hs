@@ -52,7 +52,6 @@ parseView = fmap convertTree . parseTree
             TagOpen t as -> HTMLView Nothing t (List.foldr addFeature mempty as) []
             _            -> NullView Nothing
 
-
     convertSVGTree :: TagTree Txt -> View
     convertSVGTree tree =
       case tree of
@@ -82,10 +81,12 @@ parseView = fmap convertTree . parseTree
             kvs = mapMaybe brk ss
         in
           Styles kvs
+      else if k' == "classname" || k' == "class" then
+          Class v
       else if Txt.isPrefixOf "xlink:" k' then
           id
       else
-        Property k' v
+          Attribute k' v
 
     xlinks (k,v) = let k' = Txt.toLower k in
       if Txt.isPrefixOf "xlink:" k' then
