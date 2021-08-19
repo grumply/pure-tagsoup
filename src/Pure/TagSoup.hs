@@ -17,6 +17,8 @@ import Text.HTML.TagSoup.Tree as TS
 import Text.HTML.TagSoup as TS
 import Text.StringLike
 
+import Prelude
+
 #ifdef __GHCJS__
 instance StringLike Txt where
   empty = Txt.empty
@@ -82,7 +84,7 @@ parseView = fmap convertTree . parseTree
         in
           Styles kvs
       else if k' == "classname" || k' == "class" then
-          Class v
+          Classes (List.filter (Prelude.not . Txt.null) (Txt.splitOn " " v))
       else if Txt.isPrefixOf "xlink:" k' then
           id
       else
